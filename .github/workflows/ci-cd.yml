@@ -1,80 +1,30 @@
-name: CI/CD
+name: AWS SSM Send-Command Example
 
 on:
   push:
-    branches:
-      - staging
-  pull_request:
-    branches:
-      - staging
+    branches: [staging]
 
 jobs:
-  buildAndTest:
-    name: CI Pipeline
+  start:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: ["12.x"]
 
     steps:
       - uses: actions/checkout@v2
 
-      # Initialize Node.js
-      - name: Install Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+      - name: AWS SSM Send-Command
+        uses: peterkimzz/aws-ssm-send-command@master
+        id: ssm
         with:
-          node-version: ${{ matrix.node-version }}
-
-      # Install project dependencies, test and build
-      - name: Install dependencies
-        run: npm install
-      - name: Run build
-        run: npm run build
-
-  deploy:
-    name: CD Pipeline
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.8]
-        node-version: ["12.x"]
-        appname: ["test-deploy-aws"]
-        deploy-group: ["staging"]
-
-    needs: buildAndTest
-    steps:
-      - uses: actions/checkout@v2
-
-      # Initialize Node.js
-      - name: Install Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      # Install project dependencies and build
-      - name: Install dependencies
-        run: npm install
-      - name: Run build
-        run: npm run build
-
-      # Install AWS CLI 2
-      - name: Install AWS CLI 2
-        run: |
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install
-      # Configure AWS credentials
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
+          aws-region: ${{ secrets.AWS_REGION }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1a
+          instance-ids: ${{ secrets.INSTANCE_ID }}
 
-      # Create deployment to CodeDeploy
-      - name: AWS Create Deployment
-        run: |
-          aws deploy create-deployment \
-           --application-name ${{ matrix.appname }} \
-           --deployment-config-name CodeDeployDefault.OneAtATime \
-           --deployment-group-name ${{ matrix.deploy-group }} \
+          working-directory: /home/ubuntu/Test-deploy-AWS
+          command: ls -al
+          comment: Hello world!
+          command: pm2 restart 0
+
+      # Catch SSM outputs
+      - name: Get the outputs
+        run: echo "The Command id is ${{ steps.ssm.outputs.command-id }}"
