@@ -19,4 +19,4 @@ app.post("/teste", (req, res) => {
   return res.json({ name, date });
 });
 
-app.listen(3333);
+app.listen(3333, () => console.log("Server is running"));
