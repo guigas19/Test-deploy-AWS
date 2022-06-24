@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: ["14.x"]
+        node-version: ["12.x"]
 
     steps:
       - uses: actions/checkout@v2
@@ -78,5 +78,3 @@ jobs:
            --application-name ${{ matrix.appname }} \
            --deployment-config-name CodeDeployDefault.OneAtATime \
            --deployment-group-name ${{ matrix.deploy-group }} \
-           --file-exists-behavior OVERWRITE \
-
