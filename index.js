@@ -10,7 +10,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/newrouter", (req, res) => {
-  return res.json({ message: "Nova rota!!!" });
+  return res.json({ message: "Deploy funcionando : |)" });
 });
 
 app.post("/teste", (req, res) => {
