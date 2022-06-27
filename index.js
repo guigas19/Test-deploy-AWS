@@ -6,7 +6,7 @@ const app = express();
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  return res.json({ message: "Server is up" });
+  return res.json({ message: "Server is up!" });
 });
 
 app.get("/newrouter", (req, res) => {
